@@ -39,6 +39,9 @@ public class Goal : MonoBehaviour
     {
         if (coll.gameObject.tag == "Player")
         {
+            var timer = FindObjectOfType<Timer>();
+            GameManager.instance.SaveTime(timer.time);
+
             var audioSource = GetComponent<AudioSource>();
             if (audioSource != null && goalClip != null)
             {
