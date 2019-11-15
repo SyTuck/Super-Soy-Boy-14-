@@ -1,18 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
-public class LevelEditor : MonoBehaviour
+[CustomEditor(typeof(Level))]
+public class LevelEditor : Editor
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void OnInspectorGUI()
     {
-        
-    }
+        DrawDefaultInspector();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (GUILayout.Button("Save level"))
+        {
+
+        }
     }
 }

@@ -1,5 +1,4 @@
-Last spot: Page 392 Basic Unity JSON
-
+Last spot: Page 398 Hierarchy of a Json...
 
 //git bash commands
 cd [top level game directory]
