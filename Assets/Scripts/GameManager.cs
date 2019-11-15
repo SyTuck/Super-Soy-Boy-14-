@@ -83,8 +83,9 @@ public class GameManager : MonoBehaviour
     public List<PlayerTimeEntry> LoadPreviousTimes()
     {
         try
-        {
+        {           
             var scoresFile = Application.persistentDataPath + "/" + playerName + "_times.dat";
+            Debug.Log("Trying to load file: " + scoresFile);
             using (var stream = File.Open(scoresFile, FileMode.Open))
             {
                 var bin = new BinaryFormatter();
@@ -112,13 +113,14 @@ public class GameManager : MonoBehaviour
         {
             times.Add(newTime);
             bFormatter.Serialize(file, times);
+            Debug.Log("Saving file: " + filePath);
         }
     }
 
     public void DisplayPreviousTimes()
     {
         var times = LoadPreviousTimes();
-        var topThree = times.OrderBy(Time => Time.time).Take(3);
+        var topThree = times.OrderBy(time => time.time).Take(3);
         var timesLabel = GameObject.Find("PreviousTimes").GetComponent<Text>();
 
         timesLabel.text = "BEST TIMES \n";

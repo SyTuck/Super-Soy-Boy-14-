@@ -18,7 +18,11 @@ public class PlayerName : MonoBehaviour
         {
             input.text = savedName;
             GameManager.instance.playerName = savedName;
-        }        
+        }
+        else
+        {
+            GameManager.instance.playerName = input.text;
+        }
     }
 
     // Update is called once per frame
