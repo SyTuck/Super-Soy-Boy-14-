@@ -1,4 +1,4 @@
-Last spot: Page 398 Hierarchy of a Json...
+Last spot: Page 411 Tidying up loose ends
 
 //git bash commands
 cd [top level game directory]
