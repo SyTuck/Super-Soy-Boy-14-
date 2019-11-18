@@ -43,6 +43,9 @@ public class GameManager : MonoBehaviour
 {
     public string playerName;
     public static GameManager instance;
+    public GameObject buttonPrefab;
+
+    private string selectedLevel;
 
     void Awake()
     {
@@ -61,6 +64,7 @@ public class GameManager : MonoBehaviour
     void Start ()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
+        DiscoverLevels();
 	}
 
     public void RestartLevel(float delay)
@@ -136,5 +140,49 @@ public class GameManager : MonoBehaviour
         {
             DisplayPreviousTimes();
         }
+    }
+
+    private void SetLevelName(string levelFilePath)
+    {
+        selectedLevel = levelFilePath;
+        SceneManager.LoadScene("Game");
+    }
+
+    private void DiscoverLevels()
+    {
+        var levelPanelRectTransform = GameObject.Find("LevelItemsPanel").GetComponent<RectTransform>();
+        string tempnam = Application.dataPath + "\\Levels\\";
+        var levelFiles = Directory.GetFiles(tempnam, "*.json");
+
+        var yOffset = 0f;
+
+        for (var i = 0; i < levelFiles.Length; i++)
+        {
+            if (i == 0)
+            {
+                yOffset = -30f;
+            }
+            else
+            {
+                yOffset -= 65f;
+            }
+
+            var levelFile = levelFiles[i];
+            var levelName = Path.GetFileName(levelFile);
+            Debug.Log(levelName);
+            var levelButtonObj = (GameObject)Instantiate(buttonPrefab, Vector2.zero, Quaternion.identity);
+            var levelButtonRectTransform = levelButtonObj.GetComponent<RectTransform>();
+
+            levelButtonRectTransform.SetParent(levelPanelRectTransform,true);
+            levelButtonRectTransform.anchoredPosition = new Vector2(212.5f, yOffset);
+            var levelButtonText = levelButtonObj.transform.GetChild(0).GetComponent<Text>();
+            levelButtonText.text = levelName;
+
+            var levelButton = levelButtonObj.GetComponent<Button>();
+            levelButton.onClick.AddListener(delegate { SetLevelName(levelFile); });
+            levelPanelRectTransform.sizeDelta = new Vector2(levelPanelRectTransform.sizeDelta.x, 60f * i);
+        }
+
+        levelPanelRectTransform.offsetMax = new Vector2(levelPanelRectTransform.offsetMax.x, 0f);
     }
 }
