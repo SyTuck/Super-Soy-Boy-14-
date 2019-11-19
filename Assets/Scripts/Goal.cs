@@ -47,7 +47,8 @@ public class Goal : MonoBehaviour
             {
                 audioSource.PlayOneShot(goalClip);
             }
-            GameManager.instance.RestartLevel(0.5f);
+            //GameManager.instance.RestartLevel(0.5f);
+            GameManager.instance.NextLevel(0.5f);
         }
     }
 }

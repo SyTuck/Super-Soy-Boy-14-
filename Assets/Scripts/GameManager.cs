@@ -37,6 +37,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEditor;
+
 
 
 public class GameManager : MonoBehaviour
@@ -44,8 +46,11 @@ public class GameManager : MonoBehaviour
     public string playerName;
     public static GameManager instance;
     public GameObject buttonPrefab;
+    public static int currentLevel;
 
     private string selectedLevel;
+    private static EditorBuildSettingsScene[] levelList;
+    private static int maxLevel;
 
     void Awake()
     {
@@ -63,32 +68,49 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        levelList = EditorBuildSettings.scenes;
+        maxLevel = levelList.Length;
         SceneManager.sceneLoaded += OnSceneLoaded;
         DiscoverLevels();
 	}
 
     public void RestartLevel(float delay)
     {
-        StartCoroutine(RestartLevelDelay(delay));
+        StartCoroutine(RestartLevelDelay(currentLevel, delay));
     }
 
-    private IEnumerator RestartLevelDelay(float delay)
+    public void NextLevel(float delay)
+    {
+        currentLevel++;
+        if (currentLevel >= maxLevel)
+        {
+            currentLevel = 0;
+        }
+        StartCoroutine(RestartLevelDelay(currentLevel, delay));
+    }
+
+    private IEnumerator RestartLevelDelay(int lvl, float delay)
     {
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene("Game");
+        //SceneManager.LoadScene("Game");
+        SceneManager.LoadScene(lvl);
     }
 
     // Update is called once per frame
     void Update ()
     {
-	
-	}
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("Menu");
+        }
+    }
 
     public List<PlayerTimeEntry> LoadPreviousTimes()
     {
         try
-        {           
-            var scoresFile = Application.persistentDataPath + "/" + playerName + "_times.dat";
+        {
+            var levelName = Path.GetFileName(selectedLevel);
+            var scoresFile = Application.persistentDataPath + "/" + playerName + "_" + levelName + "_times.dat";
             Debug.Log("Trying to load file: " + scoresFile);
             using (var stream = File.Open(scoresFile, FileMode.Open))
             {
@@ -112,7 +134,8 @@ public class GameManager : MonoBehaviour
         newTime.time = time;
 
         var bFormatter = new BinaryFormatter();
-        var filePath = Application.persistentDataPath + "/" + playerName + "_times.dat";
+        var levelName = Path.GetFileName(selectedLevel);
+        var filePath = Application.persistentDataPath + "/" + playerName + "_" + levelName + "_times.dat";
         using (var file = File.Open(filePath, FileMode.Create))
         {
             times.Add(newTime);
@@ -124,10 +147,17 @@ public class GameManager : MonoBehaviour
     public void DisplayPreviousTimes()
     {
         var times = LoadPreviousTimes();
+        var levelName = Path.GetFileName(selectedLevel);
+
+        if (levelName != null)
+        {
+            levelName = levelName.Replace(".json", "");
+        }
+
         var topThree = times.OrderBy(time => time.time).Take(3);
         var timesLabel = GameObject.Find("PreviousTimes").GetComponent<Text>();
+        timesLabel.text = levelName + "\n"; timesLabel.text += "BEST TIMES \n";
 
-        timesLabel.text = "BEST TIMES \n";
         foreach (var time in topThree)
         {
             timesLabel.text += time.entryDate.ToShortDateString() + ": " + time.time + "\n";
